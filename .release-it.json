@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "before:init": ["npm run lint", "npm test"],
+    "after:bump": "auto-changelog --starting-date 2025-03-01 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip changelog|Release)'",
+    "after:npm:bump": "npm pack",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
+  "git": {
+    "commitMessage": "Release ${version}",
+    "commitArgs": ["-S"],
+    "tagAnnotation": "Release ${version}",
+    "tagArgs": ["-s"],
+    "changelog": "auto-changelog -u --starting-date 2025-032-01 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip changelog|Release)' --stdout -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
+  },
+  "npm": {
+    "publish": false
+  },
+  "github": {
+    "release": true,
+    "releaseName": "metalsmith-unified-markdown ${version}",
+    "tokenRef": "GITHUB_TOKEN",
+    "assets": ["metalsmith-unified-markdown-${version}.tgz"]
+  }
+}

@@ -1,0 +1,94 @@
+<h1>GitHub Flavored Markdown Test File</h1>
+<p>This file demonstrates GitHub Flavored Markdown (GFM) features that extend beyond standard CommonMark.</p>
+<h2>Table Support</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th align="center">Supported in GFM</th>
+      <th align="center">Supported in CommonMark</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tables</td>
+      <td align="center">✅</td>
+      <td align="center">❌</td>
+    </tr>
+    <tr>
+      <td>Strikethrough</td>
+      <td align="center">✅</td>
+      <td align="center">❌</td>
+    </tr>
+    <tr>
+      <td>Autolinks</td>
+      <td align="center">✅</td>
+      <td align="center">❌</td>
+    </tr>
+    <tr>
+      <td>Task Lists</td>
+      <td align="center">✅</td>
+      <td align="center">❌</td>
+    </tr>
+    <tr>
+      <td>Emoji shortcodes</td>
+      <td align="center">✅</td>
+      <td align="center">❌</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Strikethrough Text</h2>
+<p>This is <del>strikethrough text</del> using tilde characters.</p>
+<h2>Automatic URL Linking</h2>
+<p>Plain URLs are automatically linked in GFM: <a href="https://example.com">https://example.com</a></p>
+<h2>Task Lists</h2>
+<ul class="contains-task-list">
+  <li class="task-list-item"><input type="checkbox" checked disabled> Completed task</li>
+  <li class="task-list-item"><input type="checkbox" disabled> Incomplete task</li>
+  <li class="task-list-item"><input type="checkbox" checked disabled> Another completed task
+    <ul class="contains-task-list">
+      <li class="task-list-item"><input type="checkbox" disabled> Nested task</li>
+    </ul>
+  </li>
+</ul>
+<h2>Emoji Shortcodes</h2>
+<p>:smile: :rocket: :books: :metal:</p>
+<h2>Fenced Code Blocks with Syntax Highlighting</h2>
+<pre><code class="language-javascript">function testGfm() {
+  console.log("This is GitHub Flavored Markdown");
+  return true;
+}
+</code></pre>
+<pre><code class="language-css">.gfm-specific {
+  color: #0366d6;
+  font-weight: bold;
+}
+</code></pre>
+<h2>Extended Autolinks</h2>
+<p>GFM will automatically link references like #123 (issue numbers) and @username (users).</p>
+<h2>HTML Tag Support</h2>
+<details>
+  <summary>Click to expand</summary>This content is initially hidden but can be expanded.
+</details>
+<h2>Footnotes</h2>
+<p>Here's a sentence with a footnote reference<sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref="" aria-describedby="footnote-label">1</a></sup>.</p>
+<h2>Line Breaks</h2>
+<p>
+  GFM treats a single newline as a soft break when rendering.
+  Like this line, which will appear right after the previous one.
+</p>
+<p>But a paragraph break still requires two newlines.</p>
+<h2>Indented Code</h2>
+<pre><code>// This is indented code
+const four = 2 + 2;
+</code></pre>
+<h2>Highlight Markers</h2>
+<p>GFM often supports ==highlighted text== (though implementation varies).</p>
+<section data-footnotes="" class="footnotes">
+  <h2 class="sr-only" id="footnote-label">Footnotes</h2>
+  <ol>
+    <li id="user-content-fn-1">
+      <p>This is the footnote content. <a href="#user-content-fnref-1" data-footnote-backref="" aria-label="Back to reference 1" class="data-footnote-backref">↩</a></p>
+    </li>
+  </ol>
+</section>

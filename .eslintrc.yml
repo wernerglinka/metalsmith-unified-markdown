@@ -1,0 +1,17 @@
+env:
+  node: true
+  es6: true
+extends:
+  - 'eslint:recommended'
+  - 'plugin:n/recommended'
+  - 'plugin:import/recommended'
+  - 'prettier'
+parserOptions:
+  ecmaVersion: 2020
+rules:
+  no-console: error
+  prefer-const: error
+  no-var: error
+  no-use-before-define: error
+  no-await-in-loop: error
+  'import/namespace': off
