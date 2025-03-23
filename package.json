@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-unified-markdown",
-  "version": "2.0.0",
+  "version": "0.0.1",
   "description": "A Metalsmith plugin to render markdown files to HTML using unified/remark",
   "keywords": [
     "markdown",
@@ -10,19 +10,16 @@
     "unified",
     "remark"
   ],
-  "homepage": "https://github.com/metalsmith/markdown#readme",
+  "homepage": "https://github.com/wernerglinka/metalsmith-unified-markdown#readme",
   "bugs": {
-    "url": "https://github.com/metalsmith/markdown/issues"
+    "url": "https://github.com/wernerglinka/metalsmith-unified-markdown/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/metalsmith/markdown.git"
+    "url": "https://github.com/wernerglinka/metalsmith-unified-markdown.git"
   },
   "license": "MIT",
-  "author": "Ian Storm Taylor (https://ianstormtaylor.com)",
-  "maintainers": [
-    "Kevin Van Lierde (https://webketje.com)"
-  ],
+  "author": "Werner Glinka (werner@glinka.co)",
   "source": "src/index.js",
   "main": "lib/index.cjs",
   "module": "lib/index.js",
