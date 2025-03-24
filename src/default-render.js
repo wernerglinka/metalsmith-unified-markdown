@@ -13,7 +13,7 @@ import rehypeFormat from 'rehype-format';
  * @param {Object} _context - Not used in this implementation but kept for API consistency
  * @returns {string}
  */
-export default function defaultRender(source, options, _context) {
+export default function defaultRender( source, options, _context ) {
   const {
     gfm = true,
     pedantic = false,
@@ -29,57 +29,58 @@ export default function defaultRender(source, options, _context) {
 
   // Start with basic processor
   let processor = unified()
-    .use(remarkParse, {
+    .use( remarkParse, {
       gfm,
       commonmark: !pedantic
-    })
-    .use(remarkGfm, {
+    } )
+    .use( remarkGfm, {
       tables,
       strikethrough: true,
       autolink: gfm
-    });
+    } );
 
   // Add any extended remark plugins if provided
-  if (extended.remarkPlugins) {
-    for (const plugin of extended.remarkPlugins) {
-      if (Array.isArray(plugin)) {
-        processor = processor.use(plugin[0], plugin[1]);
+  if ( extended.remarkPlugins ) {
+    for ( const plugin of extended.remarkPlugins ) {
+      if ( Array.isArray( plugin ) ) {
+        processor = processor.use( plugin[ 0 ], plugin[ 1 ] );
       } else {
-        processor = processor.use(plugin);
+        processor = processor.use( plugin );
       }
     }
   }
 
   // Transform to HTML
-  processor = processor.use(remarkRehype, {
+  processor = processor.use( remarkRehype, {
     allowDangerousHtml: !sanitize
-  });
+  } );
 
   // Include raw HTML if not sanitizing
-  if (!sanitize) {
-    processor = processor.use(rehypeRaw);
+  if ( !sanitize ) {
+    processor = processor.use( rehypeRaw );
   }
 
   // Add any extended rehype plugins if provided
-  if (extended.rehypePlugins) {
-    for (const plugin of extended.rehypePlugins) {
-      if (Array.isArray(plugin)) {
-        processor = processor.use(plugin[0], plugin[1]);
+  if ( extended.rehypePlugins ) {
+    for ( const plugin of extended.rehypePlugins ) {
+      if ( Array.isArray( plugin ) ) {
+        processor = processor.use( plugin[ 0 ], plugin[ 1 ] );
       } else {
-        processor = processor.use(plugin);
+        processor = processor.use( plugin );
       }
     }
   }
 
-  // For whitespace control, you could use rehype-format
-  processor = processor.use(rehypeFormat);
+  // For whitespace control, we could use rehype-format but take a performance hit
+  // also, we'll use HTML optimization in the built chain so this is not needed
+  // processor = processor.use(rehypeFormat);
 
   // Add stringify
-  processor = processor.use(rehypeStringify);
+  processor = processor.use( rehypeStringify );
 
   // Process the markdown content
-  return processor.process(source).then((result) => {
-    // Ensure consistent output by trimming and not adding a trailing newline
-    return String(result).trim();
-  });
+  return processor.process( source ).then( ( result ) => {
+    // Just trim the result, the tests now normalize HTML for comparison
+    return String( result ).trim();
+  } );
 }

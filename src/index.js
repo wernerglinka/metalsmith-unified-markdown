@@ -3,6 +3,7 @@ import get from 'dlv';
 import { dset as set } from 'dset';
 import expandWildcardKeypaths from './expand-wildcard-keypath.js';
 import defaultRender from './default-render.js';
+import micromarkRender from './micromark-render.js';
 
 /**
  * Convert a references object to markdown reference-style links
@@ -31,6 +32,7 @@ function refsObjectToMarkdown(refsObject) {
  * @property {Render} [render] - Specify a custom render function with the signature `(source, engineOptions, context) => string`.
  * `context` is an object with a `path` key containing the current file path, and `key` containing the target key.
  * @property {Object} [engineOptions] Options to pass to the unified/remark engine
+ * @property {boolean} [useMicromark=false] - Use micromark for faster markdown parsing
  **/
 
 const defaultOptions = {
@@ -38,7 +40,8 @@ const defaultOptions = {
   wildcard: false,
   render: defaultRender,
   engineOptions: {},
-  globalRefs: {}
+  globalRefs: {},
+  useMicromark: false
 };
 
 /**
@@ -60,6 +63,14 @@ function markdown(options = defaultOptions) {
   return function metalsmithUnifiedMarkdown(files, metalsmith, done) {
     const debug = metalsmith.debug('metalsmith-unified-markdown');
     const matches = metalsmith.match('**/*.{md,markdown}', Object.keys(files));
+    
+    // Determine which render function to use based on options
+    let renderFunction;
+    if (options.useMicromark) {
+      renderFunction = micromarkRender;
+    } else {
+      renderFunction = options.render;
+    }
 
     async function renderKeys(keys, prepend, target, path) {
       if (options.wildcard) {
@@ -71,7 +82,7 @@ function markdown(options = defaultOptions) {
         if (typeof value === 'string') {
           const context = path === 'metalsmith.metadata()' ? { key } : { path, key };
           debug.info('Rendering key "%s" of target "%s"', key.join ? key.join('.') : key, path);
-          const rendered = await options.render(prepend + value, options.engineOptions, context);
+          const rendered = await renderFunction(prepend + value, options.engineOptions, context);
           set(target, key, rendered);
         } else if (typeof value !== 'undefined') {
           debug.warn('Couldn\'t render key "%s" of target "%s": not a string', key.join ? key.join('.') : key, path);
@@ -154,7 +165,7 @@ function markdown(options = defaultOptions) {
           debug.info('Rendering file "%s" as "%s"', file, html);
 
           // Render the file contents
-          const str = await options.render(globalRefsMarkdown + data.contents.toString(), options.engineOptions, {
+          const str = await renderFunction(globalRefsMarkdown + data.contents.toString(), options.engineOptions, {
             path: file,
             key: 'contents'
           });
