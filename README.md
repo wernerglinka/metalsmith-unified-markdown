@@ -1,5 +1,7 @@
 # metalsmith-unified-markdown
 
+> **⚠️ WARNING: This plugin is currently under heavy development and is not recommended for production use at this point.**
+
 A Metalsmith plugin to render markdown files to HTML using the [unified/remark](https://unifiedjs.com/) ecosystem.
 
 [![metalsmith: core plugin][metalsmith-badge]][metalsmith-url]
@@ -82,6 +84,7 @@ metalsmith.use(
       tables: true,
       sanitize: false,
       smartLists: true,
+      smartypants: false,
       // Extended remark/rehype plugins
       extended: {
         remarkPlugins: [
@@ -98,11 +101,29 @@ metalsmith.use(
 
 `metalsmith-unified-markdown` provides the following options:
 
-- `keys`: Key names of file metadata to render to HTML in addition to its `contents` - can be nested key paths
-- `wildcard` _(default: `false`)_ - Expand `*` wildcards in `keys` option keypaths
-- `globalRefs` - An object of `{ refname: 'link' }` pairs that will be made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such object
-- `render` - Specify a custom render function with the signature `(source, engineOptions, context) => string`. `context` is an object with the signature `{ path:string, key:string }` where the `path` key contains the current file path, and `key` contains the target metadata key.
-- `engineOptions` Options to pass to the unified/remark engine
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `keys` | `string[]` or `{files: string[], global: string[]}` | `{}` | Key names of file metadata to render to HTML in addition to its `contents` - can be nested key paths |
+| `wildcard` | `boolean` | `false` | Expand `*` wildcards in `keys` option keypaths |
+| `globalRefs` | `Object<string, string>` or `string` | `{}` | An object of `{ refname: 'link' }` pairs that will be made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such object |
+| `render` | `Function` | `defaultRender` | Specify a custom render function with the signature `(source, engineOptions, context) => string`. `context` is an object with the signature `{ path:string, key:string }` where the `path` key contains the current file path, and `key` contains the target metadata key. |
+| `engineOptions` | `Object` | `{}` | Options to pass to the unified/remark engine, detailed below |
+
+#### Engine Options
+
+The following options can be passed in the `engineOptions` object:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `gfm` | `boolean` | `true` | Enable GitHub Flavored Markdown |
+| `pedantic` | `boolean` | `false` | Conform to the original markdown.pl |
+| `tables` | `boolean` | `true` | Enable GFM tables |
+| `sanitize` | `boolean` | `false` | Sanitize the output HTML |
+| `smartLists` | `boolean` | `true` | Use smarter list behavior |
+| `smartypants` | `boolean` | `false` | Use "smart" typographic punctuation |
+| `extended` | `Object` | `{}` | Extended plugins configuration |
+| `extended.remarkPlugins` | `Array` | `undefined` | Array of remark plugins to use |
+| `extended.rehypePlugins` | `Array` | `undefined` | Array of rehype plugins to use |
 
 ### Rendering metadata
 
