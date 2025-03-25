@@ -10,7 +10,7 @@
     "commitArgs": ["-S"],
     "tagAnnotation": "Release ${version}",
     "tagArgs": ["-s"],
-    "changelog": "auto-changelog -u --starting-date 2025-032-01 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip changelog|Release)' --stdout -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
+    "changelog": "auto-changelog -u --starting-date 2025-03-01 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip changelog|Release)' --stdout -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
   },
   "npm": {
     "publish": false
