@@ -63,7 +63,7 @@ function markdown(options = defaultOptions) {
   return function metalsmithUnifiedMarkdown(files, metalsmith, done) {
     const debug = metalsmith.debug('metalsmith-unified-markdown');
     const matches = metalsmith.match('**/*.{md,markdown}', Object.keys(files));
-    
+
     // Determine which render function to use based on options
     let renderFunction;
     if (options.useMicromark) {

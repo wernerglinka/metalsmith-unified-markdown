@@ -1,10 +1,9 @@
 /* eslint-env node, mocha */
 
-import assert from 'node:assert';
-import { resolve, dirname, join } from 'node:path';
-import { readFileSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import equal from 'assert-dir-equal';
+import { fileURLToPath } from 'url';
+import { dirname, resolve, join } from 'path';
+import { readFileSync } from 'fs';
+import assert from 'assert';
 import Metalsmith from 'metalsmith';
 import markdownIt from 'markdown-it';
 import markdown from '../src/index.js';
@@ -13,10 +12,10 @@ import defaultRender from '../src/default-render.js';
 // Helper for normalizing HTML to compare without caring about whitespace
 function normalizeHtml(html) {
   return html
-    .replace(/>\s+</g, '><')        // Remove whitespace between tags
-    .replace(/\s+/g, ' ')           // Normalize multiple whitespace to single space
-    .replace(/<br>\s+/g, '<br>')    // Remove space after line breaks
-    .replace(/<\/a>\s+\(/g, '</a>(')// Fix spacing in autolink followed by parenthesis
+    .replace(/>\s+</g, '><') // Remove whitespace between tags
+    .replace(/\s+/g, ' ') // Normalize multiple whitespace to single space
+    .replace(/<br>\s+/g, '<br>') // Remove space after line breaks
+    .replace(/<\/a>\s+\(/g, '</a>(') // Fix spacing in autolink followed by parenthesis
     .replace(/<summary>(.*?)<\/summary>\s+/g, '<summary>$1</summary>') // Fix spacing in summary tags
     .trim();
 }
@@ -652,7 +651,7 @@ describe('metalsmith-unified-markdown', function () {
       try {
         // We'll skip exact comparison and just verify key elements are present
         const buildFile = readFileSync('test/fixtures/commonMark-syntax/build/index.html', 'utf8');
-        
+
         // Test for major CommonMark features
         assert(buildFile.includes('CommonMark Test File'), 'Should have headline');
         assert(buildFile.includes('<em>Italic text</em>'), 'Should include italic text');
@@ -665,7 +664,7 @@ describe('metalsmith-unified-markdown', function () {
         assert(buildFile.includes('<a href="https://example.com">'), 'Should include links');
         assert(buildFile.includes('<img src="https://example.com/image.jpg"'), 'Should include images');
         assert(buildFile.includes('<hr>'), 'Should include horizontal rules');
-        
+
         done();
       } catch (error) {
         done(error);
@@ -697,7 +696,7 @@ describe('metalsmith-unified-markdown', function () {
       try {
         // We'll skip exact comparison and just verify key elements are present
         const buildFile = readFileSync('test/fixtures/gfm-syntax/build/index.html', 'utf8');
-        
+
         // Test for GFM-specific features
         assert(buildFile.includes('GitHub Flavored Markdown Test File'), 'Should have headline');
         assert(buildFile.includes('<table>'), 'Should include tables');
@@ -706,7 +705,7 @@ describe('metalsmith-unified-markdown', function () {
         assert(buildFile.includes('type="checkbox"'), 'Should include task lists');
         assert(buildFile.includes('class="language-javascript"'), 'Should include syntax highlighting');
         assert(buildFile.includes('data-footnotes'), 'Should include footnotes');
-        
+
         done();
       } catch (error) {
         done(error);
@@ -748,17 +747,17 @@ describe('metalsmith-unified-markdown', function () {
             normalizeHtml(files['index.html'].frontmatter_w_markdown),
             normalizeHtml('<p><a href="https://github.com/metalsmith/markdown" title="with title">markdown</a></p>')
           );
-          
+
           // Read and normalize build and expected files
           const buildFile = readFileSync('test/fixtures/globalrefs/build/index.html', 'utf8');
           const expectedFile = readFileSync('test/fixtures/globalrefs/expected/index.html', 'utf8');
-          
+
           assert.strictEqual(
             normalizeHtml(buildFile),
             normalizeHtml(expectedFile),
             'globalrefs output should match expected output'
           );
-          
+
           done();
         } catch (err) {
           done(err);
@@ -791,13 +790,13 @@ describe('metalsmith-unified-markdown', function () {
           // Read and normalize build and expected files
           const buildFile = readFileSync('test/fixtures/globalrefs-meta/build/index.html', 'utf8');
           const expectedFile = readFileSync('test/fixtures/globalrefs-meta/expected/index.html', 'utf8');
-          
+
           assert.strictEqual(
             normalizeHtml(buildFile),
             normalizeHtml(expectedFile),
             'globalrefs-meta output should match expected output'
           );
-          
+
           done();
         } catch (err) {
           done(err);
@@ -851,7 +850,9 @@ describe('metalsmith-unified-markdown', function () {
         'Should process emphasis in nested keys'
       );
       assert.ok(
-        normalizeHtml(files['test.html'].data.sections[0].items[1].text).includes(normalizeHtml('<strong>bold</strong>')),
+        normalizeHtml(files['test.html'].data.sections[0].items[1].text).includes(
+          normalizeHtml('<strong>bold</strong>')
+        ),
         'Should process bold in nested keys'
       );
       assert.ok(

@@ -1,14 +1,13 @@
 # metalsmith-unified-markdown
 
-> **⚠️ WARNING: This plugin is currently under heavy development and is not recommended for production use at this point.**
+> **⚠️: This plugin is a fully functional proof-of-concept. It allows you to use the unified/remark ecosystem for markdown processing. However, it is not yet fully tested and may contain bugs. Use with caution.**
 
 A Metalsmith plugin to render markdown files to HTML using the [unified/remark](https://unifiedjs.com/) ecosystem.
 
 [![metalsmith: core plugin][metalsmith-badge]][metalsmith-url]
 [![npm: version][npm-badge]][npm-url]
-[![ci: build][ci-badge]][ci-url]
-[![code coverage][codecov-badge]][codecov-url]
 [![license: MIT][license-badge]][license-url]
+[![Coverage][coverage-badge]][coverage-url]
 
 ## Features
 
@@ -102,9 +101,9 @@ metalsmith.use(
 // recommended for best performance
 metalsmith.use(
   markdown({
-    useMicromark: true,  // Enable faster markdown processing
+    useMicromark: true, // Enable faster markdown processing
     engineOptions: {
-      // Your options here
+      // Your engine options here
     }
   })
 );
@@ -112,30 +111,30 @@ metalsmith.use(
 
 `metalsmith-unified-markdown` provides the following options:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `keys` | `string[]` or `{files: string[], global: string[]}` | `{}` | Key names of file metadata to render to HTML in addition to its `contents` - can be nested key paths |
-| `wildcard` | `boolean` | `false` | Expand `*` wildcards in `keys` option keypaths |
-| `globalRefs` | `Object<string, string>` or `string` | `{}` | An object of `{ refname: 'link' }` pairs that will be made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such object |
-| `render` | `Function` | `defaultRender` | Specify a custom render function with the signature `(source, engineOptions, context) => string`. `context` is an object with the signature `{ path:string, key:string }` where the `path` key contains the current file path, and `key` contains the target metadata key. |
-| `engineOptions` | `Object` | `{}` | Options to pass to the unified/remark engine, detailed below |
-| `useMicromark` | `boolean` | `false` | Enable the micromark parser for faster markdown processing (approximately 1.7x faster) |
+| Option          | Type                                                | Default         | Description                                                                                                                                                                                                                                                                |
+| --------------- | --------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `keys`          | `string[]` or `{files: string[], global: string[]}` | `{}`            | Key names of file metadata to render to HTML in addition to its `contents` - can be nested key paths                                                                                                                                                                       |
+| `wildcard`      | `boolean`                                           | `false`         | Expand `*` wildcards in `keys` option keypaths                                                                                                                                                                                                                             |
+| `globalRefs`    | `Object<string, string>` or `string`                | `{}`            | An object of `{ refname: 'link' }` pairs that will be made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such object                                                                                                          |
+| `render`        | `Function`                                          | `defaultRender` | Specify a custom render function with the signature `(source, engineOptions, context) => string`. `context` is an object with the signature `{ path:string, key:string }` where the `path` key contains the current file path, and `key` contains the target metadata key. |
+| `engineOptions` | `Object`                                            | `{}`            | Options to pass to the unified/remark engine, detailed below                                                                                                                                                                                                               |
+| `useMicromark`  | `boolean`                                           | `false`         | Enable the micromark parser for faster markdown processing (approximately 1.7x faster)                                                                                                                                                                                     |
 
 #### Engine Options
 
 The following options can be passed in the `engineOptions` object:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `gfm` | `boolean` | `true` | Enable GitHub Flavored Markdown |
-| `pedantic` | `boolean` | `false` | Conform to the original markdown.pl |
-| `tables` | `boolean` | `true` | Enable GFM tables |
-| `sanitize` | `boolean` | `false` | Sanitize the output HTML |
-| `smartLists` | `boolean` | `true` | Use smarter list behavior |
-| `smartypants` | `boolean` | `false` | Use "smart" typographic punctuation |
-| `extended` | `Object` | `{}` | Extended plugins configuration |
-| `extended.remarkPlugins` | `Array` | `undefined` | Array of remark plugins to use |
-| `extended.rehypePlugins` | `Array` | `undefined` | Array of rehype plugins to use |
+| Option                   | Type      | Default     | Description                         |
+| ------------------------ | --------- | ----------- | ----------------------------------- |
+| `gfm`                    | `boolean` | `true`      | Enable GitHub Flavored Markdown     |
+| `pedantic`               | `boolean` | `false`     | Conform to the original markdown.pl |
+| `tables`                 | `boolean` | `true`      | Enable GFM tables                   |
+| `sanitize`               | `boolean` | `false`     | Sanitize the output HTML            |
+| `smartLists`             | `boolean` | `true`      | Use smarter list behavior           |
+| `smartypants`            | `boolean` | `false`     | Use "smart" typographic punctuation |
+| `extended`               | `Object`  | `{}`        | Extended plugins configuration      |
+| `extended.remarkPlugins` | `Array`   | `undefined` | Array of remark plugins to use      |
+| `extended.rehypePlugins` | `Array`   | `undefined` | Array of rehype plugins to use      |
 
 ### Rendering metadata
 
@@ -381,10 +380,10 @@ metalsmith.use(
 
 Micromark provides significantly faster markdown processing (approximately 1.7x improvement) while maintaining compatibility with the unified ecosystem. Our benchmark shows:
 
-| Parser | Processing Time | Improvement |
-|--------|-----------------|-------------|
-| Default (unified/remark) | 423.19ms | — |
-| Micromark | 254.66ms | 1.7x faster |
+| Parser                   | Processing Time | Improvement |
+| ------------------------ | --------------- | ----------- |
+| Default (unified/remark) | 423.19ms        | —           |
+| Micromark                | 254.66ms        | 1.7x faster |
 
 For optimal performance on most projects, we recommend enabling the micromark option.
 
@@ -455,12 +454,9 @@ Most users should experience a smooth transition with no visible changes to thei
 
 [npm-badge]: https://img.shields.io/npm/v/metalsmith-unified-markdown.svg
 [npm-url]: https://www.npmjs.com/package/metalsmith-unified-markdown
-[ci-badge]: https://img.shields.io/badge/build-passing-brightgreen
-[ci-url]: #
 [metalsmith-badge]: https://img.shields.io/badge/metalsmith-plugin-green.svg?longCache=true
 [metalsmith-url]: https://metalsmith.io
-[codecov-badge]: https://img.shields.io/badge/coverage-100%25-brightgreen
-[codecov-url]: #
 [license-badge]: https://img.shields.io/badge/license-MIT-blue
 [license-url]: LICENSE
-
+[coverage-badge]: https://img.shields.io/badge/coverage-95%25-brightgreen.svg
+[coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/blob/master/README.md
