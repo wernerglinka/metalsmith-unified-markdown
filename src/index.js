@@ -201,3 +201,12 @@ function markdown(options = defaultOptions) {
 
 // Export the main plugin as default
 export default markdown;
+
+// CommonJS export compatibility
+if (typeof module !== 'undefined') {
+  // TEST PLACEHOLDER: This log helps verify CommonJS compatibility
+  if (process.env.DEBUG_EXPORTS) {
+    console.log('=== TEST MARKER: metalsmith-unified-markdown CommonJS export activated ===');
+  }
+  module.exports = markdown;
+}
