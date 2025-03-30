@@ -10,10 +10,10 @@ import micromarkRender from './micromark-render.js';
  * @param {Object} refsObject
  * @returns {string}
  */
-function refsObjectToMarkdown(refsObject) {
-  return Object.entries(refsObject)
-    .map(([refname, value]) => `[${refname}]: ${value}`)
-    .join('\n');
+function refsObjectToMarkdown( refsObject ) {
+  return Object.entries( refsObject )
+    .map( ( [ refname, value ] ) => `[${ refname }]: ${ value }` )
+    .join( '\n' );
 }
 
 /**
@@ -49,47 +49,47 @@ const defaultOptions = {
  * @param {Options} [options]
  * @return {import('metalsmith').Plugin}
  */
-function markdown(options = defaultOptions) {
-  if (options === true) {
+function markdown( options = defaultOptions ) {
+  if ( options === true ) {
     options = defaultOptions;
   } else {
-    options = Object.assign({}, defaultOptions, options);
+    options = Object.assign( {}, defaultOptions, options );
   }
 
-  if (Array.isArray(options.keys)) {
+  if ( Array.isArray( options.keys ) ) {
     options.keys = { files: options.keys };
   }
 
-  return function metalsmithUnifiedMarkdown(files, metalsmith, done) {
-    const debug = metalsmith.debug('metalsmith-unified-markdown');
-    const matches = metalsmith.match('**/*.{md,markdown}', Object.keys(files));
+  return function metalsmithUnifiedMarkdown( files, metalsmith, done ) {
+    const debug = metalsmith.debug( 'metalsmith-unified-markdown' );
+    const matches = metalsmith.match( '**/*.{md,markdown}', Object.keys( files ) );
 
     // Determine which render function to use based on options
     let renderFunction;
-    if (options.useMicromark) {
+    if ( options.useMicromark ) {
       renderFunction = micromarkRender;
     } else {
       renderFunction = options.render;
     }
 
-    async function renderKeys(keys, prepend, target, path) {
-      if (options.wildcard) {
-        keys = expandWildcardKeypaths(target, keys, '*');
+    async function renderKeys( keys, prepend, target, path ) {
+      if ( options.wildcard ) {
+        keys = expandWildcardKeypaths( target, keys, '*' );
       }
 
-      const promises = keys.map(async (key) => {
-        const value = get(target, key);
-        if (typeof value === 'string') {
+      const promises = keys.map( async ( key ) => {
+        const value = get( target, key );
+        if ( typeof value === 'string' ) {
           const context = path === 'metalsmith.metadata()' ? { key } : { path, key };
-          debug.info('Rendering key "%s" of target "%s"', key.join ? key.join('.') : key, path);
-          const rendered = await renderFunction(prepend + value, options.engineOptions, context);
-          set(target, key, rendered);
-        } else if (typeof value !== 'undefined') {
-          debug.warn('Couldn\'t render key "%s" of target "%s": not a string', key.join ? key.join('.') : key, path);
+          debug.info( 'Rendering key "%s" of target "%s"', key.join ? key.join( '.' ) : key, path );
+          const rendered = await renderFunction( prepend + value, options.engineOptions, context );
+          set( target, key, rendered );
+        } else if ( typeof value !== 'undefined' ) {
+          debug.warn( 'Couldn\'t render key "%s" of target "%s": not a string', key.join ? key.join( '.' ) : key, path );
         }
-      });
+      } );
 
-      await Promise.all(promises);
+      await Promise.all( promises );
     }
 
     // Handle legacy Marked options for backward compatibility
@@ -113,89 +113,89 @@ function markdown(options = defaultOptions) {
       'xhtml'
     ];
 
-    const legacyEngineOptions = Object.keys(options).filter(
-      (opt) => legacyMarkedOptions.includes(opt) && !Object.keys(defaultOptions).includes(opt)
+    const legacyEngineOptions = Object.keys( options ).filter(
+      ( opt ) => legacyMarkedOptions.includes( opt ) && !Object.keys( defaultOptions ).includes( opt )
     );
 
-    if (legacyEngineOptions.length) {
-      debug.warn('Starting from version 2.0 marked engine options will need to be specified as options.engineOptions');
-      legacyEngineOptions.forEach((opt) => {
-        options.engineOptions[opt] = options[opt];
-      });
-      debug.warn('Moved engine options %s to options.engineOptions', legacyEngineOptions.join(', '));
+    if ( legacyEngineOptions.length ) {
+      debug.warn( 'Starting from version 2.0 marked engine options will need to be specified as options.engineOptions' );
+      legacyEngineOptions.forEach( ( opt ) => {
+        options.engineOptions[ opt ] = options[ opt ];
+      } );
+      debug.warn( 'Moved engine options %s to options.engineOptions', legacyEngineOptions.join( ', ' ) );
     }
 
-    debug('Running with options: %O', options);
-    if (matches.length === 0) {
-      debug.warn('No markdown files found.');
+    debug( 'Running with options: %O', options );
+    if ( matches.length === 0 ) {
+      debug.warn( 'No markdown files found.' );
     } else {
-      debug('Processing %s markdown file(s)', matches.length);
+      debug( 'Processing %s markdown file(s)', matches.length );
     }
 
     let globalRefsMarkdown = '';
-    if (typeof options.globalRefs === 'string') {
-      const found = get(metalsmith.metadata(), options.globalRefs);
-      if (found) {
-        globalRefsMarkdown = refsObjectToMarkdown(found);
+    if ( typeof options.globalRefs === 'string' ) {
+      const found = get( metalsmith.metadata(), options.globalRefs );
+      if ( found ) {
+        globalRefsMarkdown = refsObjectToMarkdown( found );
       } else {
-        const err = new Error(`globalRefs not found in metalsmith.metadata().${options.globalRefs}`);
+        const err = new Error( `globalRefs not found in metalsmith.metadata().${ options.globalRefs }` );
         err.name = 'Error metalsmith-unified-markdown';
-        return done(err);
+        return done( err );
       }
-    } else if (typeof options.globalRefs === 'object' && options.globalRefs !== null) {
-      globalRefsMarkdown = refsObjectToMarkdown(options.globalRefs);
+    } else if ( typeof options.globalRefs === 'object' && options.globalRefs !== null ) {
+      globalRefsMarkdown = refsObjectToMarkdown( options.globalRefs );
     }
 
-    if (globalRefsMarkdown.length) {
+    if ( globalRefsMarkdown.length ) {
       globalRefsMarkdown += '\n\n';
     }
 
     // Use an async approach
-    (async () => {
+    ( async () => {
       try {
         // Process all markdown files
-        const filePromises = matches.map(async (file) => {
-          const data = files[file];
-          const dir = dirname(file);
-          let html = `${basename(file, extname(file))}.html`;
-          if ('.' !== dir) {
-            html = join(dir, html);
+        const filePromises = matches.map( async ( file ) => {
+          const data = files[ file ];
+          const dir = dirname( file );
+          let html = `${ basename( file, extname( file ) ) }.html`;
+          if ( '.' !== dir ) {
+            html = join( dir, html );
           }
 
-          debug.info('Rendering file "%s" as "%s"', file, html);
+          debug.info( 'Rendering file "%s" as "%s"', file, html );
 
           // Render the file contents
-          const str = await renderFunction(globalRefsMarkdown + data.contents.toString(), options.engineOptions, {
+          const str = await renderFunction( globalRefsMarkdown + data.contents.toString(), options.engineOptions, {
             path: file,
             key: 'contents'
-          });
-          data.contents = Buffer.from(str);
+          } );
+          data.contents = Buffer.from( str );
 
           // Process additional keys if specified
           const keys = options.keys && options.keys.files ? options.keys.files : [];
-          await renderKeys(keys, globalRefsMarkdown, data, file);
+          await renderKeys( keys, globalRefsMarkdown, data, file );
 
           // Replace the markdown file with the HTML file
-          delete files[file];
-          files[html] = data;
-        });
+          delete files[ file ];
+          files[ html ] = data;
+        } );
 
         // Wait for all files to be processed
-        await Promise.all(filePromises);
+        await Promise.all( filePromises );
 
         // Process global metadata keys if specified
-        if (options.keys && options.keys.global) {
-          debug.info('Processing metalsmith.metadata()');
+        if ( options.keys && options.keys.global ) {
+          debug.info( 'Processing metalsmith.metadata()' );
           const meta = metalsmith.metadata();
-          await renderKeys(options.keys.global, globalRefsMarkdown, meta, 'metalsmith.metadata()');
+          await renderKeys( options.keys.global, globalRefsMarkdown, meta, 'metalsmith.metadata()' );
         }
 
         // All done
         done();
-      } catch (err) {
-        done(err);
+      } catch ( err ) {
+        done( err );
       }
-    })();
+    } )();
   };
 }
 
@@ -203,10 +203,6 @@ function markdown(options = defaultOptions) {
 export default markdown;
 
 // CommonJS export compatibility
-if (typeof module !== 'undefined') {
-  // TEST PLACEHOLDER: This log helps verify CommonJS compatibility
-  if (process.env.DEBUG_EXPORTS) {
-    console.log('=== TEST MARKER: metalsmith-unified-markdown CommonJS export activated ===');
-  }
+if ( typeof module !== 'undefined' ) {
   module.exports = markdown;
 }
