@@ -8,6 +8,8 @@ A Metalsmith plugin to render markdown files to HTML using the [unified/remark](
 [![npm: version][npm-badge]][npm-url]
 [![license: MIT][license-badge]][license-url]
 [![Coverage][coverage-badge]][coverage-url]
+[![ESM/CommonJS][modules-badge]][npm-url]
+[![Known Vulnerabilities](https://snyk.io/test/github/wernerglinka/metalsmith-unified-markdown/badge.svg)](https://snyk.io/test/github/wernerglinka/metalsmith-unified-markdown/badge)
 
 ## Features
 
@@ -138,7 +140,7 @@ The following options can be passed in the `engineOptions` object:
 
 ### Rendering metadata
 
-You can render markdown to HTML in file or metalsmith metadata keys by specifying the `keys` option.  
+You can render markdown to HTML in file or metalsmith metadata keys by specifying the `keys` option.
 The `keys` option also supports dot-delimited key-paths. You can also use [globalRefs within them](#defining-a-dictionary-of-markdown-globalrefs)
 
 ```js
@@ -160,7 +162,7 @@ metalsmith
   );
 ```
 
-You can even render all keys at a certain path by setting the `wildcard` option and using a globstar `*` in the keypaths.  
+You can even render all keys at a certain path by setting the `wildcard` option and using a globstar `*` in the keypaths.
 This is especially useful for arrays like the `faq` below:
 
 ```js
@@ -210,7 +212,7 @@ would be transformed into:
 
 ### Defining a dictionary of markdown globalRefs
 
-Markdown allows users to define links in [reference style](https://www.markdownguide.org/basic-syntax/#reference-style-links) (`[]:`).  
+Markdown allows users to define links in [reference style](https://www.markdownguide.org/basic-syntax/#reference-style-links) (`[]:`).
 In a Metalsmith build it may be especially desirable to be able to refer to some links globally. The `globalRefs` options allows this:
 
 ```js
@@ -458,5 +460,5 @@ Most users should experience a smooth transition with no visible changes to thei
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/badge/license-MIT-blue
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/coverage-95%25-brightgreen.svg
-[coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/blob/master/README.md
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-95%25-brightgreen
+[coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/actions/workflows/test.yml
