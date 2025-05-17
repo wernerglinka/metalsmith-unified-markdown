@@ -460,5 +460,5 @@ Most users should experience a smooth transition with no visible changes to thei
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/badge/license-MIT-blue
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/test%20coverage-84%25-green
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-99%25-brightgreen
 [coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/actions/workflows/test.yml
