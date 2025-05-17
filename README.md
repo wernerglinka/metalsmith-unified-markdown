@@ -19,6 +19,9 @@ A Metalsmith plugin to render markdown files to HTML using the [unified/remark](
 - Supports wildcard expansion for keys
 - Extensive plugin support for customizing markdown processing
 - Optimized performance with optional micromark parser (1.7x faster than standard implementation)
+- **ESM and CommonJS support**:
+  - ESM: `import markdown from 'metalsmith-unified-markdown'`;
+  - CommonJS: `const markdown = require('metalsmith-unified-markdown');`
 
 ## Why `metalsmith-unified-markdown`?
 
@@ -36,26 +39,8 @@ For most Metalsmith users, the transition to this plugin will be seamless, with 
 
 ## Installation
 
-NPM:
-
 ```bash
 npm install metalsmith-unified-markdown
-```
-
-Yarn:
-
-```bash
-yarn add metalsmith-unified-markdown
-```
-
-The plugin is available in both ESM and CommonJS formats, so it works seamlessly with both modern ES modules and traditional Node.js projects:
-
-```js
-// ESM
-import markdown from 'metalsmith-unified-markdown';
-
-// CommonJS
-const markdown = require('metalsmith-unified-markdown');
 ```
 
 ## Usage
@@ -63,8 +48,6 @@ const markdown = require('metalsmith-unified-markdown');
 `metalsmith-unified-markdown` is powered by the [unified/remark](https://unifiedjs.com/) ecosystem, providing a modern, plugin-based approach to markdown processing.
 
 ```js
-import markdown from 'metalsmith-unified-markdown';
-
 // use defaults
 metalsmith.use(markdown());
 
