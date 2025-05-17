@@ -40,7 +40,7 @@
   },
   "scripts": {
     "changelog": "auto-changelog -u --sort-commits date --starting-version v1.4.0 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip (changelog|travis)|Release)'",
-    "coverage": "c8 --include=src/**/*.js --reporter=lcov --reporter=text-summary mocha 'test/index.js' -t 15000",
+    "coverage": "c8 --include=src/**/*.js --exclude=src/micromark-render.js --reporter=lcov --reporter=text-summary mocha 'test/index.js' -t 15000",
     "format": "prettier --write \"**/*.{yml,md,js,json}\"",
     "format:check": "prettier --list-different \"**/*.{yml,md,js,json}\"",
     "lint": "eslint --fix .",
