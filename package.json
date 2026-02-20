@@ -27,7 +27,8 @@
   "module": "lib/index.js",
   "exports": {
     "import": "./lib/index.js",
-    "require": "./lib/index.cjs"
+    "require": "./lib/index.cjs",
+    "default": "./lib/index.js"
   },
   "type": "module",
   "types": "lib/index.d.ts",
@@ -40,16 +41,23 @@
   },
   "scripts": {
     "changelog": "auto-changelog -u --sort-commits date --starting-version v1.4.0 --commit-limit false --ignore-commit-pattern '((dev|chore|ci):|skip (changelog|travis)|Release)'",
-    "coverage": "c8 --include=src/**/*.js --exclude=src/micromark-render.js --reporter=lcov --reporter=text-summary mocha 'test/index.js' -t 15000",
+    "coverage": "c8 --include=src/**/*.js --exclude=src/micromark-render.js --reporter=lcov --reporter=text-summary mocha 'test/index.js' 'test/cjs.test.cjs' -t 15000",
     "format": "prettier --write \"**/*.{yml,md,js,json}\"",
     "format:check": "prettier --list-different \"**/*.{yml,md,js,json}\"",
     "lint": "eslint --fix .",
     "lint:check": "eslint --fix-dry-run .",
-    "release": "npm run build && GITHUB_TOKEN=$(grep GITHUB_TOKEN .env | cut -d '=' -f2) ./node_modules/.bin/release-it . ",
-    "release:check": "npm run lint:check && npm run build && GITHUB_TOKEN=$(grep GITHUB_TOKEN .env | cut -d '=' -f2) ./node_modules/.bin/release-it . --dry-run",
+    "release:patch": "./scripts/release.sh patch --ci",
+    "release:minor": "./scripts/release.sh minor --ci",
+    "release:major": "./scripts/release.sh major --ci",
+    "release:check": "npm run lint:check && npm run build && release-it --dry-run",
     "build": "microbundle --target node -f cjs,esm --generateTypes=false",
-    "test": "c8 mocha",
-    "benchmark": "node test/benchmark.js"
+    "test": "c8 --include=src/**/*.js mocha 'test/index.js' 'test/cjs.test.cjs' -t 15000",
+    "test:coverage": "c8 npm test",
+    "test:esm": "c8 --include=src/**/*.js mocha test/index.js -t 15000",
+    "test:cjs": "c8 --include=src/**/*.js mocha test/cjs.test.cjs -t 15000",
+    "benchmark": "node test/benchmark.js",
+    "depcheck": "depcheck",
+    "audit": "npm audit"
   },
   "dependencies": {
     "dlv": "^1.1.3",
@@ -74,6 +82,7 @@
     "assert-dir-equal": "^1.1.0",
     "auto-changelog": "^2.5.0",
     "c8": "^10.1.3",
+    "depcheck": "^1.4.7",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
@@ -92,6 +101,6 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=14.14.0"
+    "node": ">= 18.0.0"
   }
 }

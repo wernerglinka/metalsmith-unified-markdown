@@ -53,7 +53,7 @@ function markdown( options = defaultOptions ) {
   if ( options === true ) {
     options = defaultOptions;
   } else {
-    options = Object.assign( {}, defaultOptions, options );
+    options = { ...defaultOptions, ...options };
   }
 
   if ( Array.isArray( options.keys ) ) {
@@ -156,6 +156,13 @@ function markdown( options = defaultOptions ) {
         // Process all markdown files
         const filePromises = matches.map( async ( file ) => {
           const data = files[ file ];
+
+          // Validate file contents before processing
+          if ( !data.contents || !Buffer.isBuffer( data.contents ) ) {
+            debug.warn( 'Skipping "%s": invalid or missing file contents', file );
+            return;
+          }
+
           const dir = dirname( file );
           let html = `${ basename( file, extname( file ) ) }.html`;
           if ( '.' !== dir ) {
@@ -199,10 +206,11 @@ function markdown( options = defaultOptions ) {
   };
 }
 
+// Set function name for debugging
+Object.defineProperty( markdown, 'name', {
+  value: 'metalsmith-unified-markdown',
+  configurable: true
+} );
+
 // Export the main plugin as default
 export default markdown;
-
-// CommonJS export compatibility
-if ( typeof module !== 'undefined' ) {
-  module.exports = markdown;
-}
