@@ -372,6 +372,57 @@ Micromark provides significantly faster markdown processing (approximately 1.7x 
 
 For optimal performance on most projects, we recommend enabling the micromark option.
 
+## Examples
+
+### Basic Usage
+
+```js
+import Metalsmith from 'metalsmith';
+import markdown from 'metalsmith-unified-markdown';
+
+Metalsmith(__dirname)
+  .source('./src')
+  .destination('./build')
+  .use(markdown())
+  .build((err) => {
+    if (err) throw err;
+    console.log('Build complete!');
+  });
+```
+
+### With Remark/Rehype Plugins
+
+```js
+import remarkToc from 'remark-toc';
+import rehypeHighlight from 'rehype-highlight';
+
+Metalsmith(__dirname)
+  .use(
+    markdown({
+      engineOptions: {
+        gfm: true,
+        extended: {
+          remarkPlugins: [[remarkToc, { heading: 'Contents' }]],
+          rehypePlugins: [rehypeHighlight]
+        }
+      }
+    })
+  )
+  .build();
+```
+
+### High Performance Mode
+
+```js
+Metalsmith(__dirname)
+  .use(
+    markdown({
+      useMicromark: true // 1.7x faster processing
+    })
+  )
+  .build();
+```
+
 ## Debug
 
 To enable debug logs, set the `DEBUG` environment variable to `metalsmith-unified-markdown`:
