@@ -9,7 +9,6 @@ A Metalsmith plugin to render markdown files to HTML using the [unified/remark](
 [![license: MIT][license-badge]][license-url]
 [![Coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-unified-markdown/badge.svg)](https://snyk.io/test/npm/metalsmith-unified-markdown)
 
 ## Features
 
