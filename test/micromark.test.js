@@ -1,33 +1,27 @@
-import assert from 'assert';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { describe, it, before } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Metalsmith from 'metalsmith';
 import markdown from '../src/index.js';
 
-// Helper for normalizing HTML
 function normalizeHtml(html) {
-  return html
-    .replace(/>\s+</g, '><') // Remove whitespace between tags
-    .replace(/\s+/g, ' ') // Normalize multiple whitespace to single space
-    .trim();
+  return html.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('metalsmith-unified-markdown with micromark', () => {
-  // Test directory setup
   const testDir = join(__dirname, 'fixtures/micromark-test');
   const srcDir = join(testDir, 'src');
   const buildDir = join(testDir, 'build');
 
-  // Ensure test directories exist
   before(() => {
     if (!existsSync(srcDir)) {
       mkdirSync(srcDir, { recursive: true });
     }
 
-    // Create a test file with various markdown features
     const testContent = `
 # Micromark Test
 
@@ -66,7 +60,6 @@ function example() {
 
     writeFileSync(join(srcDir, 'test.md'), testContent, 'utf8');
 
-    // Create another test file with extended plugins
     const extendedContent = `
 # Extended Plugins Test
 
@@ -83,10 +76,9 @@ This content should be processed with custom plugins.
     writeFileSync(join(srcDir, 'extended.md'), extendedContent, 'utf8');
   });
 
-  it('should convert markdown to html using micromark', (done) => {
-    // First, verify the test file contains the expected raw HTML
+  it('should convert markdown to html using micromark', (_t, done) => {
     const sourceContent = readFileSync(join(srcDir, 'test.md'), 'utf8');
-    assert(sourceContent.includes('<div class="custom-class">'), 'Source file should contain raw HTML');
+    assert.ok(sourceContent.includes('<div class="custom-class">'), 'Source file should contain raw HTML');
 
     Metalsmith(testDir)
       .source('./src')
@@ -106,24 +98,21 @@ This content should be processed with custom plugins.
           const output = readFileSync(join(buildDir, 'test.html'), 'utf8');
           const normalizedOutput = normalizeHtml(output);
 
-          // Test various markdown features with normalized HTML
-          assert(normalizedOutput.includes(normalizeHtml('<h1>Micromark Test</h1>')), 'Should have h1');
-          assert(normalizedOutput.includes(normalizeHtml('<strong>bold</strong>')), 'Should have bold text');
-          assert(normalizedOutput.includes(normalizeHtml('<em>italic</em>')), 'Should have italic text');
-          assert(normalizedOutput.includes(normalizeHtml('<ul>')), 'Should have unordered list');
-          assert(normalizedOutput.includes(normalizeHtml('<li>Item 1</li>')), 'Should have list items');
-          assert(
+          assert.ok(normalizedOutput.includes(normalizeHtml('<h1>Micromark Test</h1>')), 'Should have h1');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<strong>bold</strong>')), 'Should have bold text');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<em>italic</em>')), 'Should have italic text');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<ul>')), 'Should have unordered list');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<li>Item 1</li>')), 'Should have list items');
+          assert.ok(
             normalizedOutput.includes(normalizeHtml('<pre>')) || normalizedOutput.includes(normalizeHtml('<pre ')),
             'Should have code block'
           );
-          assert(normalizedOutput.includes(normalizeHtml('<table>')), 'Should have table');
-          assert(normalizedOutput.includes(normalizeHtml('<a href="https://example.com">')), 'Should have link');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<table>')), 'Should have table');
+          assert.ok(normalizedOutput.includes(normalizeHtml('<a href="https://example.com">')), 'Should have link');
 
-          // Test for plain text content that should be preserved
-          assert(output.includes('This is raw HTML in markdown'), 'Should preserve text content');
+          assert.ok(output.includes('This is raw HTML in markdown'), 'Should preserve text content');
 
-          // Just test that HTML content was retained in some form (implementation details may vary)
-          assert(
+          assert.ok(
             output.includes('custom-class') || output.includes('This is raw HTML'),
             'Should preserve HTML content in some form'
           );
@@ -135,8 +124,7 @@ This content should be processed with custom plugins.
       });
   });
 
-  it('should handle gfm extensions properly', (done) => {
-    // Create a test file with GFM-specific features
+  it('should handle gfm extensions properly', (_t, done) => {
     const gfmContent = `
 # GFM Test
 
@@ -177,16 +165,15 @@ https://example.com
           const output = readFileSync(join(buildDir, 'gfm.html'), 'utf8');
           const normalizedOutput = normalizeHtml(output);
 
-          // Test GFM features with normalized HTML
-          assert(
+          assert.ok(
             normalizedOutput.includes(normalizeHtml('<del>This is strikethrough text</del>')),
             'Should have strikethrough'
           );
-          assert(
+          assert.ok(
             normalizedOutput.includes(normalizeHtml('<a href="https://example.com">https://example.com</a>')),
             'Should have autolink'
           );
-          assert(normalizedOutput.includes('type="checkbox"'), 'Should have task list checkboxes');
+          assert.ok(normalizedOutput.includes('type="checkbox"'), 'Should have task list checkboxes');
 
           done();
         } catch (error) {
@@ -195,7 +182,7 @@ https://example.com
       });
   });
 
-  it('should work without GFM extensions when disabled', (done) => {
+  it('should work without GFM extensions when disabled', (_t, done) => {
     Metalsmith(testDir)
       .source('./src')
       .destination('./build')
@@ -216,8 +203,7 @@ https://example.com
         try {
           const output = readFileSync(join(buildDir, 'gfm.html'), 'utf8');
 
-          // Test that GFM features are not processed
-          assert(!output.includes('<del>This is strikethrough text</del>'), 'Should not have strikethrough');
+          assert.ok(!output.includes('<del>This is strikethrough text</del>'), 'Should not have strikethrough');
 
           done();
         } catch (error) {
@@ -226,7 +212,7 @@ https://example.com
       });
   });
 
-  it('should sanitize HTML when sanitize option is enabled', (done) => {
+  it('should sanitize HTML when sanitize option is enabled', (_t, done) => {
     Metalsmith(testDir)
       .source('./src')
       .destination('./build')
@@ -248,14 +234,12 @@ https://example.com
           const output = readFileSync(join(buildDir, 'test.html'), 'utf8');
           const normalizedOutput = normalizeHtml(output);
 
-          // HTML should be sanitized
-          assert(
+          assert.ok(
             !normalizedOutput.includes(normalizeHtml('<div class="custom-class">')),
             'Should not include raw HTML when sanitize is true'
           );
 
-          // Regular markdown should still work
-          assert(
+          assert.ok(
             normalizedOutput.includes(normalizeHtml('<h1>Micromark Test</h1>')),
             'Should still process regular markdown'
           );
@@ -267,7 +251,7 @@ https://example.com
       });
   });
 
-  it('should process markdown with extended plugins pathway', (done) => {
+  it('should process markdown with extended plugins pathway', (_t, done) => {
     Metalsmith(testDir)
       .source('./src')
       .destination('./build')
@@ -277,7 +261,6 @@ https://example.com
           useMicromark: true,
           engineOptions: {
             extended: {
-              // This forces micromark to use the full MDAST -> HAST pipeline
               remarkPlugins: [() => (tree) => tree]
             }
           }
@@ -291,13 +274,12 @@ https://example.com
         try {
           const output = readFileSync(join(buildDir, 'extended.html'), 'utf8');
 
-          // Verify the content was processed through the extended pipeline
-          assert(
+          assert.ok(
             output.includes('<h1>Extended Plugins Test</h1>'),
             'Should process markdown with extended plugins pipeline'
           );
-          assert(output.includes('<li>List item 1</li>'), 'Should process lists through extended pipeline');
-          assert(
+          assert.ok(output.includes('<li>List item 1</li>'), 'Should process lists through extended pipeline');
+          assert.ok(
             output.includes('<a href="https://example.com">Reference link</a>'),
             'Should process reference links through extended pipeline'
           );

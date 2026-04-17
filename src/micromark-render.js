@@ -16,21 +16,7 @@ import { gfmFromMarkdown } from 'mdast-util-gfm';
  */
 export default function micromarkRender(source, options, _context) {
   return new Promise((resolve) => {
-    const {
-      gfm: useGfm = true,
-      // These options are kept for API compatibility but not used
-      // eslint-disable-next-line no-unused-vars
-      pedantic = false,
-      // eslint-disable-next-line no-unused-vars
-      tables = true,
-      sanitize = false,
-      // eslint-disable-next-line no-unused-vars
-      smartLists = true,
-      // eslint-disable-next-line no-unused-vars
-      smartypants = false,
-      // Extended options
-      extended = {}
-    } = options;
+    const { gfm: useGfm = true, sanitize = false, extended = {} } = options;
 
     let html;
 

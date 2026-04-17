@@ -13,18 +13,7 @@ import rehypeStringify from 'rehype-stringify';
  * @returns {string}
  */
 export default function defaultRender(source, options, _context) {
-  const {
-    gfm = true,
-    pedantic = false,
-    tables = true,
-    sanitize = false,
-    // smartLists and smartypants are kept for API compatibility but not used in unified
-    // eslint-disable-next-line no-unused-vars
-    smartLists = true,
-    // eslint-disable-next-line no-unused-vars
-    smartypants = false,
-    extended = {}
-  } = options;
+  const { gfm = true, pedantic = false, tables = true, sanitize = false, extended = {} } = options;
 
   // Start with basic processor
   let processor = unified()

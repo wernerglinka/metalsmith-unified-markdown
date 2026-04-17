@@ -1,40 +1,24 @@
 # metalsmith-unified-markdown
 
-> **⚠️: This plugin is a fully functional proof-of-concept. It allows you to use the unified/remark ecosystem for markdown processing. However, it is not yet fully tested and may contain bugs. Use with caution.**
+> **⚠️ This plugin is a fully functional proof-of-concept.** It allows you to use the unified/remark ecosystem for markdown processing. However, it is not yet fully tested and may contain bugs. Use with caution.
 
-A Metalsmith plugin to render markdown files to HTML using the [unified/remark](https://unifiedjs.com/) ecosystem.
+A Metalsmith plugin that renders markdown files to HTML using the [unified/remark](https://unifiedjs.com/) ecosystem, with an optional [micromark](https://github.com/micromark/micromark) fast path.
 
-[![metalsmith: core plugin][metalsmith-badge]][metalsmith-url]
+[![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![npm: version][npm-badge]][npm-url]
 [![license: MIT][license-badge]][license-url]
 [![Coverage][coverage-badge]][coverage-url]
-[![ESM/CommonJS][modules-badge]][npm-url]
+
+> **Version 0.1.0** is ESM-only and requires Node.js 22+. See the migration guide below.
 
 ## Features
 
-- Compiles `.md` and `.markdown` files in `metalsmith.source()` to HTML using the modern unified/remark ecosystem
-- Enables rendering file or metalsmith metadata keys to HTML through the `keys` option
-- Adds support for reference-style links shared across all markdown files via `globalRefs`
-- Supports wildcard expansion for keys
-- Extensive plugin support for customizing markdown processing
-- Optimized performance with optional micromark parser (1.7x faster than standard implementation)
-- **ESM and CommonJS support**:
-  - ESM: `import markdown from 'metalsmith-unified-markdown'`;
-  - CommonJS: `const markdown = require('metalsmith-unified-markdown');`
-
-## Why `metalsmith-unified-markdown`?
-
-`metalsmith-unified-markdown` is inspired by `@metalsmith/markdown` but takes a modern approach by using the [unified/remark](https://unifiedjs.com/) ecosystem for Markdown processing. While maintaining full API compatibility with `@metalsmith/markdown`, this plugin offers several significant advantages:
-
-- **Modern Architecture**: Built on the unified/remark ecosystem which represents current best practices in the JavaScript community
-- **Extensive Plugin Ecosystem**: Access to hundreds of specialized plugins for tasks like table of contents generation, syntax highlighting, math equations, diagrams, and more
-- **Standards Compliance**: Produces HTML5-compliant output with properly quoted attributes and modern syntax
-- **Improved Performance**: Processes files in parallel for better speed with larger projects
-- **Better Maintainability**: Benefits from the active development and security updates of the unified ecosystem
-- **Tree-based Processing**: The AST (Abstract Syntax Tree) approach enables more sophisticated transformations
-- **Developer Experience**: Better TypeScript support and modern JavaScript features
-
-For most Metalsmith users, the transition to this plugin will be seamless, with the added benefit of gaining access to a rich ecosystem of processing plugins. Any differences in HTML output are primarily in formatting (whitespace, attribute quoting) and don't affect visual rendering or SEO.
+- Compiles `.md` and `.markdown` files in `metalsmith.source()` to HTML.
+- Renders additional file or `metalsmith.metadata()` keys to HTML through the `keys` option.
+- Supports reference-style links shared across all markdown files via `globalRefs`.
+- Expands `*` wildcards in `keys` keypaths to render collections and arrays.
+- Extensible via custom remark and rehype plugins through `engineOptions.extended`.
+- Optional micromark parser (`useMicromark: true`) for faster processing.
 
 ## Installation
 
@@ -44,22 +28,22 @@ npm install metalsmith-unified-markdown
 
 ## Usage
 
-`metalsmith-unified-markdown` is powered by the [unified/remark](https://unifiedjs.com/) ecosystem, providing a modern, plugin-based approach to markdown processing.
+```js
+import Metalsmith from 'metalsmith';
+import markdown from 'metalsmith-unified-markdown';
+
+Metalsmith(import.meta.dirname)
+  .source('./src')
+  .destination('./build')
+  .use(markdown())
+  .build((err) => {
+    if (err) throw err;
+  });
+```
+
+With custom options:
 
 ```js
-// use defaults
-metalsmith.use(markdown());
-
-// use explicit defaults
-metalsmith.use(
-  markdown({
-    wildcard: false,
-    keys: [],
-    engineOptions: {}
-  })
-);
-
-// with custom options
 metalsmith.use(
   markdown({
     engineOptions: {
@@ -67,63 +51,52 @@ metalsmith.use(
       pedantic: false,
       tables: true,
       sanitize: false,
-      smartLists: true,
-      smartypants: false,
-      // Extended remark/rehype plugins
       extended: {
-        remarkPlugins: [
-          // Add remarkPlugins here
-        ],
-        rehypePlugins: [
-          // Add rehypePlugins here
-        ]
+        remarkPlugins: [],
+        rehypePlugins: []
       }
-    }
-  })
-);
-
-// recommended for best performance
-metalsmith.use(
-  markdown({
-    useMicromark: true, // Enable faster markdown processing
-    engineOptions: {
-      // Your engine options here
     }
   })
 );
 ```
 
-`metalsmith-unified-markdown` provides the following options:
+Fast path with micromark:
+
+```js
+metalsmith.use(
+  markdown({
+    useMicromark: true,
+    engineOptions: {}
+  })
+);
+```
+
+## Options
 
 | Option          | Type                                                | Default         | Description                                                                                                                                                                                                                                                                |
 | --------------- | --------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `keys`          | `string[]` or `{files: string[], global: string[]}` | `{}`            | Key names of file metadata to render to HTML in addition to its `contents` - can be nested key paths                                                                                                                                                                       |
-| `wildcard`      | `boolean`                                           | `false`         | Expand `*` wildcards in `keys` option keypaths                                                                                                                                                                                                                             |
-| `globalRefs`    | `Object<string, string>` or `string`                | `{}`            | An object of `{ refname: 'link' }` pairs that will be made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such object                                                                                                          |
-| `render`        | `Function`                                          | `defaultRender` | Specify a custom render function with the signature `(source, engineOptions, context) => string`. `context` is an object with the signature `{ path:string, key:string }` where the `path` key contains the current file path, and `key` contains the target metadata key. |
-| `engineOptions` | `Object`                                            | `{}`            | Options to pass to the unified/remark engine, detailed below                                                                                                                                                                                                               |
-| `useMicromark`  | `boolean`                                           | `false`         | Enable the micromark parser for faster markdown processing (approximately 1.7x faster)                                                                                                                                                                                     |
+| `keys`          | `string[]` or `{files: string[], global: string[]}` | `{}`            | Key names of file metadata to render to HTML in addition to `contents` — can be nested key paths.                                                                                                                                                                          |
+| `wildcard`      | `boolean`                                           | `false`         | Expand `*` wildcards in `keys` keypaths.                                                                                                                                                                                                                                   |
+| `globalRefs`    | `Object<string, string>` or `string`                | `{}`            | An object of `{ refname: 'link' }` pairs made available for all markdown files and keys, or a `metalsmith.metadata()` keypath containing such an object.                                                                                                                   |
+| `render`        | `Function`                                          | `defaultRender` | Custom render function with the signature `(source, engineOptions, context) => string`. `context` is `{ path, key }` where `path` is the current file path and `key` is the target metadata key.                                                                          |
+| `engineOptions` | `Object`                                            | `{}`            | Options passed to the unified/remark engine (see below).                                                                                                                                                                                                                   |
+| `useMicromark`  | `boolean`                                           | `false`         | Use the micromark parser for faster markdown processing.                                                                                                                                                                                                                   |
 
-#### Engine Options
+### Engine Options
 
-The following options can be passed in the `engineOptions` object:
-
-| Option                   | Type      | Default     | Description                         |
-| ------------------------ | --------- | ----------- | ----------------------------------- |
-| `gfm`                    | `boolean` | `true`      | Enable GitHub Flavored Markdown     |
-| `pedantic`               | `boolean` | `false`     | Conform to the original markdown.pl |
-| `tables`                 | `boolean` | `true`      | Enable GFM tables                   |
-| `sanitize`               | `boolean` | `false`     | Sanitize the output HTML            |
-| `smartLists`             | `boolean` | `true`      | Use smarter list behavior           |
-| `smartypants`            | `boolean` | `false`     | Use "smart" typographic punctuation |
-| `extended`               | `Object`  | `{}`        | Extended plugins configuration      |
-| `extended.remarkPlugins` | `Array`   | `undefined` | Array of remark plugins to use      |
-| `extended.rehypePlugins` | `Array`   | `undefined` | Array of rehype plugins to use      |
+| Option                   | Type      | Default     | Description                                            |
+| ------------------------ | --------- | ----------- | ------------------------------------------------------ |
+| `gfm`                    | `boolean` | `true`      | Enable GitHub Flavored Markdown.                       |
+| `pedantic`               | `boolean` | `false`     | Conform to the original markdown.pl (disables CommonMark). |
+| `tables`                 | `boolean` | `true`      | Enable GFM tables.                                     |
+| `sanitize`               | `boolean` | `false`     | Sanitize the output HTML (drops raw HTML).             |
+| `extended`               | `Object`  | `{}`        | Extended plugins configuration.                        |
+| `extended.remarkPlugins` | `Array`   | `undefined` | Remark plugins to register on the processor.           |
+| `extended.rehypePlugins` | `Array`   | `undefined` | Rehype plugins to register on the processor.           |
 
 ### Rendering metadata
 
-You can render markdown to HTML in file or metalsmith metadata keys by specifying the `keys` option.
-The `keys` option also supports dot-delimited key-paths. You can also use [globalRefs within them](#defining-a-dictionary-of-markdown-globalrefs)
+You can render markdown to HTML in file or metalsmith metadata keys by specifying the `keys` option. Dot-delimited keypaths are supported, and `globalRefs` are resolved inside them:
 
 ```js
 metalsmith
@@ -144,8 +117,7 @@ metalsmith
   );
 ```
 
-You can even render all keys at a certain path by setting the `wildcard` option and using a globstar `*` in the keypaths.
-This is especially useful for arrays like the `faq` below:
+Render all keys at a given path by enabling `wildcard` and using `*` in the keypaths. This is especially useful for arrays like the `faq` below:
 
 ```js
 metalsmith.use(
@@ -171,7 +143,7 @@ faq:
 ---
 ```
 
-would be transformed into:
+is transformed to:
 
 ```json
 {
@@ -186,16 +158,15 @@ would be transformed into:
 }
 ```
 
-**Notes about the wildcard**
+Notes about the wildcard:
 
-- It acts like the single bash globstar. If you specify `*` this would only match the properties at the first level of the metadata.
-- If a wildcard keypath matches a key whose value is not a string, it will be ignored.
-- It is set to `false` by default because it can incur some overhead if it is applied too broadly.
+- It behaves like a single bash globstar. `*` only matches the first level.
+- A wildcard keypath that matches a non-string value is ignored.
+- It is `false` by default because broad usage adds overhead.
 
 ### Defining a dictionary of markdown globalRefs
 
-Markdown allows users to define links in [reference style](https://www.markdownguide.org/basic-syntax/#reference-style-links) (`[]:`).
-In a Metalsmith build it may be especially desirable to be able to refer to some links globally. The `globalRefs` options allows this:
+Markdown allows users to define links in [reference style](https://www.markdownguide.org/basic-syntax/#reference-style-links) (`[]:`). In a Metalsmith build it is often useful to share link references globally. The `globalRefs` option enables this:
 
 ```js
 metalsmith.use(
@@ -209,12 +180,10 @@ metalsmith.use(
 );
 ```
 
-Now _contents of any file or metadata key_ processed by metalsmith-unified-markdown will be able to refer to these links as `[My Twitter][twitter_link]` or `![Me][photo]`. You can also store the globalRefs object of the previous example in a `metalsmith.metadata()` key and pass its keypath as `globalRefs` option instead.
-
-This enables a flow where you can load the refs into global metadata from a source file with [@metalsmith/metadata](https://github.com/metalsmith/metadata), and use them both in markdown and templating plugins like [@metalsmith/layouts](https://github.com/metalsmith/layouts):
+Any file or metadata key processed by the plugin can then refer to these links as `[My Twitter][twitter_link]` or `![Me][photo]`. You can also store the refs in `metalsmith.metadata()` and pass their keypath as `globalRefs` instead. This makes it possible to load refs into global metadata from a source file with [@metalsmith/metadata](https://github.com/metalsmith/metadata) and use them in markdown and in templating plugins like [@metalsmith/layouts](https://github.com/metalsmith/layouts):
 
 ```js
-metalsith
+metalsmith
   .metadata({
     global: {
       links: {
@@ -231,13 +200,13 @@ metalsith
 
 ### Using unified/remark with plugins
 
-You can add custom remark and rehype plugins to enhance markdown processing. First, install the plugins you need:
+Add custom remark and rehype plugins to extend markdown processing. First install the plugins you need:
 
 ```bash
 npm install remark-toc rehype-highlight
 ```
 
-Then use them in your metalsmith configuration:
+Then register them via `engineOptions.extended`:
 
 ```js
 import remarkToc from 'remark-toc';
@@ -249,9 +218,7 @@ metalsmith.use(
       gfm: true,
       tables: true,
       sanitize: false,
-      // Extended options for adding plugins
       extended: {
-        // Custom plugin configurations
         remarkPlugins: [[remarkToc, { heading: 'Table of Contents' }]],
         rehypePlugins: [[rehypeHighlight, { subset: ['javascript', 'css', 'html'] }]]
       }
@@ -262,7 +229,7 @@ metalsmith.use(
 
 ### Custom render function
 
-You can create a fully custom render function:
+You can supply your own render function:
 
 ```js
 import { unified } from 'unified';
@@ -279,45 +246,27 @@ metalsmith.use(
     render(source, options) {
       const { gfm = true, pedantic = false, tables = true, sanitize = false, extended = {} } = options;
 
-      // Create processor
       const processor = unified()
-        .use(remarkParse, {
-          gfm,
-          commonmark: !pedantic
-        })
-        .use(remarkGfm, {
-          tables,
-          strikethrough: true,
-          autolink: gfm
-        });
+        .use(remarkParse, { gfm, commonmark: !pedantic })
+        .use(remarkGfm, { tables, strikethrough: true, autolink: gfm });
 
-      // Add optional table of contents
       if (extended.toc) {
         processor.use(remarkToc, extended.toc);
       }
 
-      // Transform to HTML
-      processor.use(remarkRehype, {
-        allowDangerousHtml: !sanitize
-      });
+      processor.use(remarkRehype, { allowDangerousHtml: !sanitize });
 
-      // Include raw HTML if not sanitizing
       if (!sanitize) {
         processor.use(rehypeRaw);
       }
 
-      // Add syntax highlighting
       if (extended.highlight) {
         processor.use(rehypeHighlight, extended.highlight);
       }
 
-      // Output HTML
       processor.use(rehypeStringify);
 
-      // Process and return (matching the async implementation in default-render.js)
-      return processor.process(source).then((result) => {
-        return String(result).trim();
-      });
+      return processor.process(source).then((result) => String(result).trim());
     },
     engineOptions: {
       gfm: true,
@@ -333,69 +282,64 @@ metalsmith.use(
 
 ### Using another markdown library
 
-If you don't want to use unified/remark, you can use another markdown rendering library through the `render` option. For example, this is how you could use [markdown-it](https://github.com/markdown-it/markdown-it) instead:
+If you prefer a different markdown library, pass it via the `render` option. For example, using [markdown-it](https://github.com/markdown-it/markdown-it):
 
 ```js
-import MarkdownIt from 'markdown-it'
+import MarkdownIt from 'markdown-it';
 
-let markdownIt
-metalsmith.use(markdown({
-  render(source, opts, context) {
-    if (!markdownIt) markdownIt = new MarkdownIt(opts)
-    if (context.key == 'contents') return mdIt.render(source)
-    return markdownIt.renderInline(source)
-  },
-  // specify markdownIt options here
-  engineOptions: { ... }
-}))
-```
-
-### Performance Optimization with Micromark
-
-For the best performance, you can enable the micromark parser, which is the underlying parser behind the unified/remark ecosystem:
-
-```js
+let markdownIt;
 metalsmith.use(
   markdown({
-    useMicromark: true // Enable micromark for faster parsing
+    render(source, opts, context) {
+      if (!markdownIt) markdownIt = new MarkdownIt(opts);
+      if (context.key === 'contents') return markdownIt.render(source);
+      return markdownIt.renderInline(source);
+    },
+    engineOptions: {
+      /* markdown-it options */
+    }
   })
 );
 ```
 
-Micromark provides significantly faster markdown processing (approximately 1.7x improvement) while maintaining compatibility with the unified ecosystem. Our benchmark shows:
+### Using micromark
 
-| Parser                   | Processing Time | Improvement |
-| ------------------------ | --------------- | ----------- |
-| Default (unified/remark) | 423.19ms        | —           |
-| Micromark                | 254.66ms        | 1.7x faster |
+Enable the micromark parser with `useMicromark: true`:
 
-For optimal performance on most projects, we recommend enabling the micromark option.
+```js
+metalsmith.use(
+  markdown({
+    useMicromark: true
+  })
+);
+```
+
+When `engineOptions.extended.remarkPlugins` or `engineOptions.extended.rehypePlugins` are set, the micromark path falls back to the MDAST → HAST → HTML pipeline so custom plugins still run.
 
 ## Examples
 
-### Basic Usage
+### Basic
 
 ```js
 import Metalsmith from 'metalsmith';
 import markdown from 'metalsmith-unified-markdown';
 
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .source('./src')
   .destination('./build')
   .use(markdown())
   .build((err) => {
     if (err) throw err;
-    console.log('Build complete!');
   });
 ```
 
-### With Remark/Rehype Plugins
+### With remark/rehype plugins
 
 ```js
 import remarkToc from 'remark-toc';
 import rehypeHighlight from 'rehype-highlight';
 
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(
     markdown({
       engineOptions: {
@@ -410,13 +354,13 @@ Metalsmith(__dirname)
   .build();
 ```
 
-### High Performance Mode
+### Micromark fast path
 
 ```js
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(
     markdown({
-      useMicromark: true // 1.7x faster processing
+      useMicromark: true
     })
   )
   .build();
@@ -424,23 +368,15 @@ Metalsmith(__dirname)
 
 ## Debug
 
-To enable debug logs, set the `DEBUG` environment variable to `metalsmith-unified-markdown`:
-
-Linux/Mac:
+Set the `DEBUG` environment variable to enable debug logs:
 
 ```
 DEBUG=metalsmith-unified-markdown
 ```
 
-Windows:
-
-```
-set DEBUG=metalsmith-unified-markdown
-```
-
 ### CLI Usage
 
-Add `metalsmith-unified-markdown` key to your `metalsmith.json` plugins key
+Add `metalsmith-unified-markdown` to the plugins key of your `metalsmith.json`:
 
 ```json
 {
@@ -450,38 +386,36 @@ Add `metalsmith-unified-markdown` key to your `metalsmith.json` plugins key
         "gfm": true,
         "pedantic": false,
         "tables": true,
-        "sanitize": false,
-        "smartLists": true,
-        "smartypants": false
+        "sanitize": false
       }
     }
   }
 }
 ```
 
+## Migration from v0.0.x to v0.1.0
+
+Version 0.1.0 modernizes the toolchain. The plugin API, options, and output are unchanged.
+
+### Breaking Changes
+
+1. **ESM only.** The CommonJS build is gone. Use `import markdown from 'metalsmith-unified-markdown'` from an ESM project. Node 22+ can still `require()` the ESM package thanks to stable `require(esm)` support, so CJS consumers are not locked out — but `import` is the authoritative syntax.
+2. **Node.js 22+ required.** Earlier versions are unsupported. The plugin uses the native `node:test` runner and native coverage, both of which require Node 22+.
+3. **No more `lib/` directory.** The package publishes directly from `src/`. If any code was importing deep paths like `metalsmith-unified-markdown/lib/...`, update it to use the public `import markdown from 'metalsmith-unified-markdown'` entry.
+
 ## Compatibility with @metalsmith/markdown
 
-This plugin maintains compatibility with the API of `@metalsmith/markdown`, making it easy to adopt in existing projects. Here's what you should know:
+The plugin preserves the `@metalsmith/markdown` API where possible:
 
-### Handled Automatically
+- Legacy root-level engine options (`gfm`, `tables`, etc.) are moved into `engineOptions` with a deprecation warning.
+- Core markdown features (headings, lists, code blocks, links, etc.) behave the same.
+- `.md` and `.markdown` files are converted to `.html` as before.
+- The `keys` option for processing markdown in metadata works the same.
 
-1. **Legacy Options Support**: Options like `gfm`, `tables`, etc. are automatically mapped to their unified/remark equivalents.
+Differences to be aware of:
 
-2. **Markdown Rendering**: Core markdown features like headings, lists, code blocks, and links work identically.
-
-3. **File Extensions**: `.md` and `.markdown` files are automatically converted to `.html` just like before.
-
-4. **Metadata Keys**: The `keys` option for processing markdown in metadata works the same way.
-
-### Potential Adjustment Areas
-
-1. **HTML Output**: The HTML output has slightly different whitespace/formatting. If you have tests comparing exact HTML output, they might need updating.
-
-2. **Custom Renderers**: If you used marked's custom renderer system, you can now use the more powerful remark/rehype plugins through the `extended` options.
-
-3. **Plugin System**: The plugin system uses `extended.remarkPlugins` and `extended.rehypePlugins` for adding functionality.
-
-Most users should experience a smooth transition with no visible changes to their site output.
+- HTML output whitespace and attribute quoting may differ slightly. Tests comparing exact strings may need updating.
+- The `render` hook replaces marked's custom renderer system. Use remark/rehype plugins via `extended` for pipeline extensions.
 
 ## License
 
@@ -495,4 +429,3 @@ Most users should experience a smooth transition with no visible changes to thei
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-99%25-brightgreen
 [coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/actions/workflows/test.yml
-[modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
