@@ -8,6 +8,7 @@ A Metalsmith plugin that renders markdown files to HTML using the [unified/remar
 [![npm: version][npm-badge]][npm-url]
 [![license: MIT][license-badge]][license-url]
 [![Coverage][coverage-badge]][coverage-url]
+[![ESM][modules-badge]][npm-url]
 
 > **Version 0.1.0** is ESM-only and requires Node.js 22+. See the migration guide below.
 
@@ -429,3 +430,4 @@ Differences to be aware of:
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-99%25-brightgreen
 [coverage-url]: https://github.com/wernerglinka/metalsmith-unified-markdown/actions/workflows/test.yml
+[modules-badge]: https://img.shields.io/badge/module-ESM-blue
